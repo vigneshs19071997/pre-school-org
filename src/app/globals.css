@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Overwritten per-tenant by the root layout. These are only fallbacks
+       so the page is never unstyled if something goes wrong upstream. */
+    --brand-primary: #22305c;
+    --brand-primary-dark: #141d38;
+    --brand-accent: #ffc233;
+    --brand-accent-alt: #ff8a75;
+    --brand-accent-green: #5fbf77;
+    --brand-accent-purple: #b49ce3;
+    --brand-ink: #1e2a44;
+    --brand-ink-soft: #5b6b85;
+    --brand-paper: #fffbf2;
+    --brand-surface: #fff6e8;
+    --brand-radius: 24px;
+
+    /* RGB-channel twins so Tailwind's /opacity modifiers work - see
+       src/lib/theme.ts, which generates both forms from the tenant config. */
+    --brand-primary-rgb: 34 48 92;
+    --brand-primary-dark-rgb: 20 29 56;
+    --brand-accent-rgb: 255 194 51;
+    --brand-accent-alt-rgb: 255 138 117;
+    --brand-accent-green-rgb: 95 191 119;
+    --brand-accent-purple-rgb: 180 156 227;
+    --brand-ink-rgb: 30 42 68;
+    --brand-ink-soft-rgb: 91 107 133;
+    --brand-paper-rgb: 255 251 242;
+    --brand-surface-rgb: 255 246 232;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--brand-paper);
+    color: var(--brand-ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Visible keyboard focus everywhere. Non-negotiable. */
+  :focus-visible {
+    outline: 3px solid var(--brand-accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: var(--brand-accent);
+    color: var(--brand-ink);
+  }
+}
+
+@layer components {
+  /* Scroll reveal. Elements start hidden and are released by the
+     IntersectionObserver in <Reveal>. If JS never runs, the
+     no-js fallback below makes everything visible anyway. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition:
+      opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* The crayon underline. Drawn with stroke-dashoffset on load. */
+  .crayon-path {
+    stroke-dasharray: 340;
+    stroke-dashoffset: 340;
+    animation: draw 1.1s cubic-bezier(0.65, 0, 0.35, 1) 0.45s forwards;
+  }
+
+  /* Same idea as .crayon-path, but pathLength-normalised so it works for any
+     doodle underline regardless of its actual SVG path length. */
+  .scribble-path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw-normalised 0.9s cubic-bezier(0.65, 0, 0.35, 1) 0.6s forwards;
+  }
+
+  @keyframes draw-normalised {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* An organic, hand-cut blob frame for the hero photo. */
+  .blob-frame {
+    border-radius: 63% 37% 54% 46% / 43% 37% 63% 57%;
+  }
+
+  /* Paper cut-out cards: a hair of rotation, straightened on hover.
+     This is the collage motif that runs through the whole page. */
+  .paper-card {
+    transition:
+      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .paper-card:hover {
+    transform: rotate(0deg) translateY(-6px) !important;
+  }
+
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 32s linear infinite;
+  }
+
+  .marquee-mask {
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  .crayon-path {
+    stroke-dashoffset: 0;
+  }
+
+  .scribble-path {
+    stroke-dashoffset: 0;
+  }
+}
